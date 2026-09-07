@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="my">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0b0b0b">
+  <meta name="description" content="Style — Wallet Shop Center & Fancy Shop Center">
+  <title>Style Shop</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="ambient ambient-a"></div><div class="ambient ambient-b"></div>
+  <header class="topbar">
+    <button class="icon-btn" id="menuBtn" aria-label="Menu">☰</button>
+    <a class="brand" href="#home"><img src="https://lh3.googleusercontent.com/d/1bM_UNFnp1L8VyqSkPBIQwfUNdQX0-07J" alt="Style logo"><span>STYLE</span></a>
+    <button class="icon-btn cart-btn" id="cartBtn" aria-label="Cart">🛒<b id="cartCount">0</b></button>
+  </header>
+
+  <main id="home">
+    <section class="hero">
+      <div class="eyebrow">PREMIUM DIGITAL STORE</div>
+      <h1>Style</h1>
+      <p>ရွှေအိုရောင်အလှနဲ့ သင့်အတွက်ရွေးချယ်ထားတဲ့ Shop Centers နှစ်ခု။</p>
+      <div class="center-grid">
+        <button class="center-card wallet" data-center="wallet"><span class="card-icon">◈</span><strong>Wallet Shop Center</strong><small>Wallet & digital products</small><i>Explore →</i></button>
+        <button class="center-card fancy" data-center="fancy"><span class="card-icon">✦</span><strong>Fancy Shop Center</strong><small>Fancy & lifestyle products</small><i>Explore →</i></button>
+      </div>
+    </section>
+
+    <section class="catalog" id="catalog">
+      <div class="section-head"><div><span class="eyebrow">SHOP</span><h2 id="catalogTitle">Featured Products</h2></div><button class="ghost" id="searchBtn">⌕ Search</button></div>
+      <div class="filters" id="filters"><button class="filter active" data-filter="all">All</button><button class="filter" data-filter="wallet">Wallet</button><button class="filter" data-filter="fancy">Fancy</button></div>
+      <div class="products" id="products"></div>
+    </section>
+  </main>
+
+  <aside class="drawer" id="drawer"><button class="close" id="closeDrawer">×</button><div class="drawer-brand">STYLE</div><button>Home</button><button>Wallet Shop Center</button><button>Fancy Shop Center</button><button>My Orders</button><button>Language / ဘာသာ</button><button>Theme</button></aside>
+  <div class="overlay" id="overlay"></div>
+
+  <section class="cart-panel" id="cartPanel"><div class="panel-head"><h2>Your Cart</h2><button class="close" id="closeCart">×</button></div><div id="cartItems" class="cart-items"></div><div class="cart-foot"><div><span>Total</span><strong id="cartTotal">0 MMK</strong></div><button class="gold-btn" id="checkoutBtn">Continue to Order</button></div></section>
+
+  <div class="toast" id="toast"></div>
+  <script src="app.js"></script>
+</body>
+</html>
