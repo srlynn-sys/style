@@ -1,54 +1,55 @@
-/* Style Saan backend bridge: Firestore-backed products/orders/reports with localStorage fallback. */
+/* Style Saan backend bridge: Firestore is the shared source of truth; localStorage is only a cache/fallback. */
 (async function(){
   const maps={'style-products':'products','style-orders':'orders','style-reports':'reports','style-songs':'songs'};
   try{
     const fb=await window.StyleSaanFirebaseReady;
-    const {collection,doc,getDocs,setDoc,deleteDoc,onSnapshot}=await import('https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js');
+    const {collection,doc,getDocs,setDoc,onSnapshot}=await import('https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js');
     const {db}=fb;
-    const busy=new Set();
-    const arr=v=>{try{return JSON.parse(v||'[]')||[]}catch{return[]}};
-    async function push(key,value){
-      const col=maps[key]; if(!col||busy.has(key))return;
-      busy.add(key);
-      try{
-        const next=arr(value),remote=await getDocs(collection(db,col)),ids=new Set(next.map(x=>String(x.id)));
-        await Promise.all(remote.docs.filter(d=>!ids.has(String(d.id))).map(d=>deleteDoc(d.ref)));
-        await Promise.all(next.filter(x=>x&&x.id!=null).map(x=>setDoc(doc(db,col,String(x.id)),x,{merge:true})));
-      }finally{busy.delete(key)}
-    }
     const originalSet=Storage.prototype.setItem;
+    const originalRemove=Storage.prototype.removeItem;
+    const queues={};
+    const arr=v=>{try{return JSON.parse(v||'[]')||[]}catch{return[]}};
+    const syncLocalToFirestore=(key,value)=>{
+      const col=maps[key];if(!col)return Promise.resolve();
+      queues[key]=(queues[key]||Promise.resolve()).then(async()=>{
+        const next=arr(value);
+        await Promise.all(next.filter(x=>x&&x.id!=null).map(x=>setDoc(doc(db,col,String(x.id)),x,{merge:true})));
+      }).catch(console.error);
+      return queues[key];
+    };
     Storage.prototype.setItem=function(key,value){
       originalSet.call(this,key,value);
-      if(this===localStorage&&maps[key])push(key,value).catch(console.error);
+      if(this===localStorage&&maps[key])syncLocalToFirestore(key,value);
     };
-    const originalRemove=Storage.prototype.removeItem;
     Storage.prototype.removeItem=function(key){
       originalRemove.call(this,key);
-      if(this===localStorage&&maps[key])push(key,'[]').catch(console.error);
+      /* Do not delete the cloud collection from a stale device cache. */
     };
-    for(const [key,col] of Object.entries(maps)){
+    window.StyleSaanBackendReady=Promise.all(Object.entries(maps).map(async([key,col])=>{
       const snap=await getDocs(collection(db,col));
-      if(snap.empty){await push(key,localStorage.getItem(key)||'[]');}
-      else{
-        const data=snap.docs.map(d=>d.data());
-        busy.add(key);originalSet.call(localStorage,key,JSON.stringify(data));busy.delete(key);
+      if(!snap.empty){
+        originalSet.call(localStorage,key,JSON.stringify(snap.docs.map(d=>d.data())));
+      }else{
+        await syncLocalToFirestore(key,localStorage.getItem(key)||'[]');
       }
       onSnapshot(collection(db,col),s=>{
-        if(busy.has(key))return;
         const data=s.docs.map(d=>d.data());
-        busy.add(key);originalSet.call(localStorage,key,JSON.stringify(data));busy.delete(key);
+        originalSet.call(localStorage,key,JSON.stringify(data));
+        if(typeof window.StyleSaanRenderAll==='function')window.StyleSaanRenderAll();
         if(typeof window.loadAll==='function')window.loadAll();
-        if(location.pathname.endsWith('shop.html')||location.pathname.endsWith('wallet.html')||location.pathname.endsWith('fancy.html')){
-          const p=location.pathname.split('/').pop();
-          if(p==='shop.html'&&typeof window.home==='function')window.home();
-          if(p==='wallet.html'&&typeof window.centerPage==='function')window.centerPage('wallet');
-          if(p==='fancy.html'&&typeof window.centerPage==='function')window.centerPage('fancy');
-        }
+        if(location.pathname.endsWith('shop.html')&&typeof window.home==='function')window.home();
+        if(location.pathname.endsWith('wallet.html')&&typeof window.centerPage==='function')window.centerPage('wallet');
+        if(location.pathname.endsWith('fancy.html')&&typeof window.centerPage==='function')window.centerPage('fancy');
       });
-    }
-    window.StyleSaanBackend={db,collection,doc,getDocs,setDoc,deleteDoc};
-    console.log('[Style Saan] Firebase backend connected');
-  }catch(err){console.warn('[Style Saan] Firebase unavailable; local mode remains active.',err)}
+    }));
+    await window.StyleSaanBackendReady;
+    window.StyleSaanBackend={db,collection,doc,getDocs,setDoc};
+    window.dispatchEvent(new CustomEvent('style-saan-backend-ready'));
+    console.log('[Style Saan] Firebase backend connected — cloud sync ready');
+  }catch(err){
+    window.StyleSaanBackendReady=Promise.resolve(false);
+    console.warn('[Style Saan] Firebase unavailable; local mode remains active.',err);
+  }
 })();
 
 /* Firebase Email/Password admin authentication. */
@@ -58,14 +59,14 @@ window.addEventListener('load',async()=>{
     const fb=await window.StyleSaanFirebaseReady;
     const {signInWithEmailAndPassword,onAuthStateChanged,signOut}=await import('https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js');
     const email=document.getElementById('email'),password=document.getElementById('password'),msg=document.getElementById('loginMsg'),login=document.getElementById('login'),dashboard=document.getElementById('dashboard'),btn=document.getElementById('loginBtn'),logout=document.getElementById('logout');
-    const show=ok=>{if(login)login.classList.toggle('hidden',ok);if(dashboard)dashboard.classList.toggle('hidden',!ok);if(ok&&typeof window.loadAll==='function')window.loadAll()};
+    const show=ok=>{if(login)login.classList.toggle('hidden',ok);if(dashboard)dashboard.classList.toggle('hidden',!ok);if(ok&&typeof window.StyleSaanRenderAll==='function')window.StyleSaanRenderAll()};
     onAuthStateChanged(fb.auth,user=>show(!!user));
     btn.onclick=async()=>{if(!email.value||!password.value){msg.textContent='Email နဲ့ Password ဖြည့်ပါ။';return}msg.textContent='ဝင်နေပါပြီ…';try{await signInWithEmailAndPassword(fb.auth,email.value.trim(),password.value);msg.textContent=''}catch(e){msg.textContent='Login မအောင်မြင်ပါ။ Firebase Authentication မှာ Email/Password ကိုစစ်ပါ။';console.error(e)}};
     if(logout)logout.onclick=()=>signOut(fb.auth).catch(console.error);
   }catch(e){console.warn('[Style Saan] Firebase Auth bridge unavailable',e)}
 });
 
-/* Free payment-slip upload: compress the image in the browser and attach it to the next order as slipImageUrl. This avoids a paid Storage dependency. */
+/* Free payment-slip upload: compress the image in the browser and attach it to the next order as slipImageUrl. */
 (function(){
   const MAX_BYTES=780000;
   const compressImage=file=>new Promise((resolve,reject)=>{
@@ -81,13 +82,13 @@ window.addEventListener('load',async()=>{
     payment.parentNode.insertBefore(box,payment.nextSibling);
     const input=box.querySelector('#styleSlipInput'),msg=box.querySelector('#styleSlipMsg');
     input.onchange=async()=>{window.StyleSaanPendingSlip=null;if(!input.files[0])return;msg.textContent='Slip ပြင်ဆင်နေပါပြီ…';try{window.StyleSaanPendingSlip=await compressImage(input.files[0]);msg.textContent='✓ Slip အဆင်သင့်ဖြစ်ပါပြီ';msg.style.color='#9ddd8d'}catch(e){msg.textContent='Slip ပုံကြီးလွန်းပါတယ်။ ပိုသေးတဲ့ပုံရွေးပါ။';msg.style.color='#ff8d82'}};
-    const originalSet=Storage.prototype.setItem;
+    const originalSlipSet=Storage.prototype.setItem;
     if(!window.__styleSlipStorageHook){
       window.__styleSlipStorageHook=true;
       Storage.prototype.setItem=function(key,value){
         if(this===localStorage&&key==='style-orders'&&window.StyleSaanPendingSlip){
           try{const a=JSON.parse(value||'[]');if(a.length){const i=a.length-1;a[i].slipImageUrl=window.StyleSaanPendingSlip;a[i].paymentSlipUrl=window.StyleSaanPendingSlip;value=JSON.stringify(a)}window.StyleSaanPendingSlip=null}catch(e){console.error(e)}}
-        return originalSet.call(this,key,value)
+        return originalSlipSet.call(this,key,value)
       };
     }
   }
