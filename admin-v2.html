@@ -30,4 +30,4 @@ async function renderSongs(){const a=await docs('songs');$('songsList').innerHTM
 $('saveSong').onclick=async()=>{const id=$('sid').value||'song-'+Date.now(),name=$('sname').value.trim(),url=$('surl').value.trim();if(!name||!url)return alert('Song Name နဲ့ Link ဖြည့်ပါ');await saveDoc('songs',id,{id,name,url,updatedAt:new Date().toISOString()});$('clearSong').click();refresh()};$('clearSong').onclick=()=>{$('sid').value='';$('sname').value='';$('surl').value='';$('songTest').innerHTML=''};
 $('testSong').onclick=()=>{const url=$('surl').value.trim();if(!url)return alert('Song link ထည့်ပါ');const a=document.createElement('audio');a.controls=true;a.preload='metadata';a.src=url;a.style.width='100%';$('songTest').innerHTML='';$('songTest').appendChild(a);a.play().catch(()=>{$('songTest').insertAdjacentHTML('beforeend','<p class="bad">ဒီ link ကို browser audio အနေနဲ့ဖွင့်မရပါ။ Chatbox.moe မှ direct audio/file link ကိုသုံးပါ။</p>')})};
 makeDetailInputs();makeDriveInputs();tabs();start();
-</script></body></html>
+</script><script src="admin-fixes.js"></script></body></html>
