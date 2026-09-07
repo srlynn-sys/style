@@ -95,3 +95,26 @@ window.addEventListener('load',async()=>{
   const observer=new MutationObserver(()=>setupSlip());
   window.addEventListener('load',()=>observer.observe(document.body,{childList:true,subtree:true}));
 })();
+
+/* Online payment account details. */
+(function(){
+  const PHONE='09782158964';
+  const NAME='Daw Khin Ma Ma';
+  const NOTE='မည်သည့် မှားလွှဲမူမျိုးကိုမဆို Style Saan မှ လက်မခံပါ။';
+  function setupOnlinePayment(){
+    if(!location.pathname.endsWith('checkout.html'))return;
+    const payment=document.getElementById('payment');
+    if(!payment||document.getElementById('styleOnlinePaymentInfo'))return;
+    const box=document.createElement('div');
+    box.id='styleOnlinePaymentInfo';
+    box.style.cssText='display:none;margin:12px 0;padding:16px;border:1px solid rgba(216,180,90,.38);border-radius:18px;background:linear-gradient(145deg,#19130a,#0e0d0a);color:#ead59a;box-shadow:0 12px 30px rgba(0,0,0,.28)';
+    box.innerHTML='<div style="font-size:.72rem;letter-spacing:.14em;color:#d8b45a;font-weight:800;margin-bottom:10px">ONLINE PAYMENT</div><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:7px"><span style="opacity:.72">Phone Number</span><strong style="font-size:1.08rem;letter-spacing:.04em;color:#fff">'+PHONE+'</strong></div><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px"><span style="opacity:.72">Name</span><strong style="color:#fff">'+NAME+'</strong></div><div style="padding:10px 12px;border-radius:12px;background:rgba(216,180,90,.08);border:1px solid rgba(216,180,90,.15);font-size:.8rem;line-height:1.55"><b style="color:#d8b45a">Note :</b> '+NOTE+'</div>';
+    payment.parentNode.insertBefore(box,payment.nextSibling);
+    const sync=()=>{box.style.display=payment.value==='online'?'block':'none'};
+    payment.addEventListener('change',sync);
+    sync();
+  }
+  window.addEventListener('load',()=>setTimeout(setupOnlinePayment,300));
+  const observer=new MutationObserver(()=>setupOnlinePayment());
+  window.addEventListener('load',()=>observer.observe(document.body,{childList:true,subtree:true}));
+})();
