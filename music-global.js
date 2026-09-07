@@ -1,0 +1,21 @@
+(()=>{
+  if(window.__StyleSaanGlobalMusic)return;
+  window.__StyleSaanGlobalMusic=true;
+  let audio=null,songs=[],current=-1,modal=null;
+  const clean=x=>String(x||'').trim();
+  const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  async function loadSongs(){
+    try{const fb=await window.StyleSaanFirebaseReady;const {collection,getDocs}=await import('https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js');const s=await getDocs(collection(fb.db,'songs'));songs=s.docs.map(d=>({id:d.id,...d.data()})).filter(x=>clean(x.url));if(songs.length)return songs}catch(e){console.warn('[Style Saan] global songs load failed',e)}
+    try{return JSON.parse(localStorage.getItem('style-songs')||'[]').filter(x=>clean(x.url))}catch{return[]}
+  }
+  function bubble(){return document.querySelector('#styleMusicBubble,.style-music-bubble')}
+  function label(){return document.querySelector('#styleMusicLabel,.style-music-label')}
+  function say(t){const l=label();if(!l)return;l.textContent=t;l.classList.add('show');clearTimeout(window.__styleGlobalMusicLabel);window.__styleGlobalMusicLabel=setTimeout(()=>l.classList.remove('show'),2600)}
+  function audioEl(){if(audio)return audio;audio=document.createElement('audio');audio.id='style-saan-global-audio';audio.preload='auto';audio.setAttribute('playsinline','');audio.style.display='none';document.body.appendChild(audio);audio.onplay=()=>{const b=bubble();b?.classList.add('playing');if(b)b.textContent='🎶'};audio.onpause=()=>{const b=bubble();b?.classList.remove('playing');if(b)b.textContent='♫'};audio.onended=()=>{if(songs.length>1)play((current+1)%songs.length)};audio.onerror=()=>say('Song Link ကို Audio အဖြစ်ဖွင့်မရပါ');return audio}
+  async function play(i){songs=await loadSongs();if(!songs.length){say('ADMIN → Songs မှာ Song မရှိသေးပါ');return}const s=songs[i],url=clean(s.url);if(!url)return;current=i;const a=audioEl();try{a.pause();a.src=url;a.load();say('Loading '+(s.name||'Song')+'…');await a.play();say(s.name||'STYLE SAAN MUSIC')}catch(e){console.warn('[Style Saan] global play failed',e);say('Song မဖွင့်နိုင်ပါ — Admin → Test Link စစ်ပါ')}}
+  function ensureModal(){if(modal)return;modal=document.createElement('div');modal.id='styleGlobalMusicModal';modal.innerHTML='<b>🎵 STYLE SAAN MUSIC</b><div class="style-global-song-list"></div>';document.body.appendChild(modal);const st=document.createElement('style');st.textContent='#styleGlobalMusicModal{position:fixed;right:18px;bottom:88px;width:min(310px,calc(100vw - 36px));max-height:330px;overflow:auto;padding:14px;border:1px solid rgba(216,180,90,.4);border-radius:18px;background:rgba(12,10,8,.97);backdrop-filter:blur(16px);color:#ead59a;z-index:100001;display:none;box-shadow:0 20px 60px #000c}.style-global-song-list{display:grid;gap:7px;margin-top:10px}.style-global-song{display:block;width:100%;text-align:left;padding:11px;border-radius:12px;border:1px solid #4b3a20;background:#17130d;color:#fff}.style-global-song small{display:block;color:#a99b7b;margin-top:3px}';document.head.appendChild(st);modal.onclick=e=>{const x=e.target.closest('.style-global-song');if(x){modal.style.display='none';play(Number(x.dataset.i))}}}
+  async function render(){ensureModal();songs=await loadSongs();modal.querySelector('.style-global-song-list').innerHTML=songs.map((s,i)=>`<button type="button" class="style-global-song" data-i="${i}"><b>${i===current?'🎶':'🎵'} ${esc(s.name||'Song')}</b><small>${i===current?'Playing':'Tap to play'}</small></button>`).join('')||'<small>Admin Panel → Songs မှာ Song ထည့်ပါ။</small>'}
+  function bind(){const b=bubble();if(!b||b.dataset.globalMusicBound==='1')return;b.dataset.globalMusicBound='1';b.onclick=async e=>{e.preventDefault();e.stopPropagation();songs=await loadSongs();if(songs.length===1){if(audio&&!audio.paused){audio.pause();say('MUSIC PAUSED')}else await play(0)}else{await render();modal.style.display=modal.style.display==='block'?'none':'block'}};ensureModal();document.addEventListener('click',e=>{if(modal&&!modal.contains(e.target)&&e.target!==b)modal.style.display='none'},{capture:true})}
+  function init(){setTimeout(bind,80)}
+  window.addEventListener('load',init);window.addEventListener('style-saan-backend-ready',init);init();
+})();
