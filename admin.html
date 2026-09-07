@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="my">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0b0b0b">
+  <title>Style — Admin Center</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    :root{--g:#d6b35a;--g2:#f4d98b;--bg:#090909;--panel:#121212;--line:rgba(214,179,90,.2);--muted:#9b9b9b;--danger:#d85c5c;--ok:#63b88b}
+    body{background:radial-gradient(circle at 50% -10%,rgba(214,179,90,.13),transparent 35%),var(--bg);color:#f7f2e6;padding:0}
+    .admin-wrap{max-width:1180px;margin:auto;padding:18px}
+    .admin-top{position:sticky;top:0;z-index:20;display:flex;justify-content:space-between;align-items:center;padding:14px 0;background:rgba(9,9,9,.88);backdrop-filter:blur(18px)}
+    .brand{display:flex;gap:12px;align-items:center}.brand img{width:42px;height:42px;border-radius:12px;object-fit:cover;border:1px solid var(--line)}.brand b{font-size:1.05rem}.brand span{display:block;color:var(--muted);font-size:.72rem;margin-top:2px}
+    .top-actions{display:flex;gap:8px}.btn{border:1px solid var(--line);background:#151515;color:#eee;padding:10px 13px;border-radius:11px;font-weight:800;cursor:pointer}.btn.gold{background:linear-gradient(135deg,#b78d32,var(--g2));color:#17120a;border:0}.btn.danger{color:#ffb0b0}
+    .login{max-width:440px;margin:12vh auto;padding:28px;background:linear-gradient(145deg,#151515,#0e0e0e);border:1px solid var(--line);border-radius:24px;box-shadow:0 25px 70px rgba(0,0,0,.45)}
+    .login h1{font-size:1.5rem;margin-bottom:6px}.login p{color:var(--muted);margin-bottom:22px}.field{margin:12px 0}.field label{display:block;font-size:.78rem;color:#c9c1af;margin-bottom:7px}.field input,.field select,.field textarea{width:100%;background:#0a0a0a;border:1px solid #292929;color:#fff;border-radius:12px;padding:12px;outline:0}.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--g)}
+    .hidden{display:none!important}.dashboard{display:none}.dashboard.on{display:block}
+    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0}.stat,.panel{background:linear-gradient(145deg,rgba(22,22,22,.98),rgba(13,13,13,.98));border:1px solid var(--line);border-radius:18px}.stat{padding:17px}.stat small{color:var(--muted)}.stat strong{display:block;font-size:1.55rem;margin-top:6px;color:var(--g2)}
+    .tabs{display:flex;gap:8px;overflow:auto;padding:3px 0 13px;position:sticky;top:70px;z-index:10;background:rgba(9,9,9,.9);backdrop-filter:blur(15px)}.tab{white-space:nowrap}.tab.active{background:linear-gradient(135deg,#b78d32,var(--g2));color:#17120a;border:0}
+    .panel{padding:18px;margin-bottom:14px}.panel-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:15px}.panel-head h2{font-size:1rem}.muted{color:var(--muted);font-size:.82rem}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}.products{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.product{border:1px solid #292929;border-radius:15px;padding:13px;background:#0c0c0c}.product img{width:100%;aspect-ratio:1;border-radius:11px;object-fit:cover;background:#171717}.product b{display:block;margin-top:9px}.product .price{color:var(--g2);font-weight:900;margin-top:4px}.product-actions{display:flex;gap:7px;margin-top:10px}.product-actions .btn{flex:1;font-size:.75rem;padding:8px}
+    .order{border:1px solid #292929;border-radius:15px;padding:14px;margin-bottom:10px;background:#0d0d0d}.order-top{display:flex;justify-content:space-between;gap:10px}.badge{padding:5px 8px;border-radius:999px;background:#252016;color:var(--g2);font-size:.7rem;font-weight:900}.order-meta{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px;color:#c9c9c9;font-size:.8rem}.order select{margin-top:10px;width:100%;background:#090909;color:#fff;border:1px solid #292929;border-radius:10px;padding:9px}
+    .table-wrap{overflow:auto}.table{width:100%;border-collapse:collapse;min-width:650px}.table th,.table td{text-align:left;padding:11px;border-bottom:1px solid #242424;font-size:.8rem}.table th{color:var(--g2)}
+    .center-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.center-card{padding:20px;border:1px solid var(--line);border-radius:18px;background:radial-gradient(circle at 100% 0,rgba(214,179,90,.12),transparent 45%),#101010}.center-card h3{margin-bottom:5px}.center-card p{color:var(--muted);font-size:.82rem}
+    .switch{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid #222}.switch:last-child{border:0}.switch input{accent-color:var(--g);width:18px;height:18px}
+    @media(max-width:800px){.stats{grid-template-columns:repeat(2,1fr)}.products{grid-template-columns:repeat(2,1fr)}.grid2,.center-grid{grid-template-columns:1fr}.admin-wrap{padding:12px}.tabs{top:68px}}
+    @media(max-width:430px){.products{grid-template-columns:1fr 1fr}.stat strong{font-size:1.25rem}.order-meta{grid-template-columns:1fr}.brand span{display:none}}
+  </style>
+</head>
+<body>
+<div class="admin-wrap">
+  <header class="admin-top">
+    <div class="brand"><img src="https://lh3.googleusercontent.com/d/1bM_UNFnp1L8VyqSkPBIQwfUNdQX0-07J" alt="Style"><div><b>STYLE ADMIN</b><span>Wallet • Fancy Shop Center</span></div></div>
+    <div class="top-actions"><a class="btn" href="index.html">Shop</a><button class="btn danger" id="logout">Logout</button></div>
+  </header>
+
+  <section id="login" class="login">
+    <h1>Admin Control Center</h1><p>Style Shop ကို စီမံခန့်ခွဲရန် ဝင်ရောက်ပါ။</p>
+    <div class="field"><label>Admin Email</label><input id="email" type="email" autocomplete="username" placeholder="admin@example.com"></div>
+    <div class="field"><label>Password</label><input id="password" type="password" autocomplete="current-password" placeholder="••••••••"></div>
+    <button class="btn gold" style="width:100%;margin-top:8px" id="loginBtn">Dashboard ဝင်မည် →</button>
+    <p id="loginMsg" style="margin:12px 0 0;color:#e99;font-size:.8rem"></p>
+  </section>
+
+  <main id="dashboard" class="dashboard">
+    <section class="stats">
+      <div class="stat"><small>Total Orders</small><strong id="statOrders">0</strong></div><div class="stat"><small>Pending</small><strong id="statPending">0</strong></div><div class="stat"><small>Products</small><strong id="statProducts">0</strong></div><div class="stat"><small>Revenue</small><strong id="statRevenue">0 Ks</strong></div>
+    </section>
+    <nav class="tabs">
+      <button class="btn tab active" data-tab="orders">📦 Orders</button><button class="btn tab" data-tab="products">🏷 Products</button><button class="btn tab" data-tab="centers">🛍 Centers</button><button class="btn tab" data-tab="customers">👤 Customers</button><button class="btn tab" data-tab="reports">📊 Reports</button><button class="btn tab" data-tab="settings">⚙ Settings</button>
+    </nav>
+
+    <section class="tab-page" id="orders">
+      <div class="panel"><div class="panel-head"><div><h2>Order Management</h2><span class="muted">Status, customer information and order history</span></div><button class="btn" id="refreshOrders">Refresh</button></div><div id="ordersList"><p class="muted">Backend ချိတ်ပြီးနောက် orders တွေ ဒီနေရာမှာ realtime ပြပါမယ်။</p></div></div>
+    </section>
+
+    <section class="tab-page hidden" id="products">
+      <div class="grid2"><div class="panel"><div class="panel-head"><h2 id="productFormTitle">Add Product</h2><button class="btn" id="clearProduct">Clear</button></div><input type="hidden" id="productId"><div class="field"><label>Center</label><select id="productCenter"><option value="wallet">Wallet Shop Center</option><option value="fancy">Fancy Shop Center</option></select></div><div class="field"><label>Product Name</label><input id="productName" placeholder="Product name"></div><div class="field"><label>Price (Ks)</label><input id="productPrice" type="number" placeholder="0"></div><div class="field"><label>Stock</label><input id="productStock" type="number" placeholder="0"></div><div class="field"><label>Show Photo URL</label><input id="productImage" placeholder="https://..."></div><div class="field"><label>Detail Photo URLs</label><textarea id="productDetails" rows="3" placeholder="URL, URL, URL"></textarea></div><div class="field"><label>Description / Note</label><textarea id="productNote" rows="3" placeholder="Product details"></textarea></div><button class="btn gold" style="width:100%" id="saveProduct">Save Product</button></div><div class="panel"><div class="panel-head"><h2>Inventory</h2><input id="productSearch" class="btn" style="width:160px" placeholder="Search"></div><div id="productGrid" class="products"></div></div></div>
+    </section>
+
+    <section class="tab-page hidden" id="centers"><div class="panel"><div class="panel-head"><div><h2>Shop Center Management</h2><span class="muted">Only two centers are enabled for Style.</span></div></div><div class="center-grid"><div class="center-card"><h3>◈ Wallet Shop Center</h3><p>Wallet, card holder, small leather goods and related items.</p><div class="switch"><span>Center active</span><input type="checkbox" checked></div></div><div class="center-card"><h3>✦ Fancy Shop Center</h3><p>Fashion accessories, beauty/fancy items and gifts.</p><div class="switch"><span>Center active</span><input type="checkbox" checked></div></div></div></div></section>
+
+    <section class="tab-page hidden" id="customers"><div class="panel"><div class="panel-head"><div><h2>Customers</h2><span class="muted">Customer profiles will be generated from orders.</span></div></div><div class="table-wrap"><table class="table"><thead><tr><th>Name</th><th>Phone</th><th>Orders</th><th>Last Order</th></tr></thead><tbody id="customerTable"><tr><td colspan="4" class="muted">No customer data yet.</td></tr></tbody></table></div></div></section>
+
+    <section class="tab-page hidden" id="reports"><div class="panel"><div class="panel-head"><div><h2>Reports & Analytics</h2><span class="muted">Sales, order status and stock overview</span></div></div><div class="stats"><div class="stat"><small>Wallet Sales</small><strong id="walletSales">0 Ks</strong></div><div class="stat"><small>Fancy Sales</small><strong id="fancySales">0 Ks</strong></div></div><div id="reportNote" class="muted">Backend ချိတ်ပြီးရင် Firestore data ကနေ report တွေကိုတွက်ပေးပါမယ်။</div></div></section>
+
+    <section class="tab-page hidden" id="settings"><div class="panel"><div class="panel-head"><div><h2>Style Settings</h2><span class="muted">Store preferences</span></div></div><div class="field"><label>Store Name</label><input value="Style"></div><div class="field"><label>Currency</label><input value="Ks"></div><div class="switch"><span>Dark Luxury Theme</span><input type="checkbox" checked></div><div class="switch"><span>Wallet Shop Center</span><input type="checkbox" checked></div><div class="switch"><span>Fancy Shop Center</span><input type="checkbox" checked></div><div class="switch"><span>Order Notifications</span><input type="checkbox" checked></div><p class="muted" style="margin-top:15px">Firebase / Telegram credentials မထည့်သေးတဲ့အတွက် settings တွေက UI foundation အနေနဲ့သာရှိပါတယ်။ Secrets ကို frontend ထဲ hard-code မလုပ်ပါ။</p></div></section>
+  </main>
+</div>
+<script>
+const $=id=>document.getElementById(id);const tabs=[...document.querySelectorAll('.tab')];
+function showTab(name){tabs.forEach(b=>b.classList.toggle('active',b.dataset.tab===name));document.querySelectorAll('.tab-page').forEach(p=>p.classList.toggle('hidden',p.id!==name));}
+tabs.forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.tab)));
+$('loginBtn').onclick=()=>{const e=$('email').value.trim(),p=$('password').value;if(!e||!p){$('loginMsg').textContent='Email နဲ့ password ထည့်ပါ။';return}localStorage.setItem('styleAdminSession','demo');$('login').classList.add('hidden');$('dashboard').classList.add('on');$('loginMsg').textContent=''};
+$('logout').onclick=()=>{localStorage.removeItem('styleAdminSession');location.reload()};
+if(localStorage.getItem('styleAdminSession')){$('login').classList.add('hidden');$('dashboard').classList.add('on')}
+$('clearProduct').onclick=()=>['productId','productName','productPrice','productStock','productImage','productDetails','productNote'].forEach(id=>$(id).value='');
+$('saveProduct').onclick=()=>alert('Product form ready. Firebase ချိတ်ပြီးတာနဲ့ ဒီ button က Firestore ကို save လုပ်ပါမယ်။');
+$('refreshOrders').onclick=()=>alert('Orders realtime sync ကို new Firebase backend ချိတ်ပြီး enable လုပ်ပါမယ်။');
+</script>
+</body>
+</html>
