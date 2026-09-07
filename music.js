@@ -18,7 +18,25 @@
     }catch(e){console.warn('[Style Saan] songs unavailable',e)}
     if(!songs.length){try{songs=JSON.parse(localStorage.getItem('style-songs')||'[]').filter(x=>x.url)}catch{songs=[]}}
     list.innerHTML=songs.length?songs.map((s,i)=>`<a href="${String(s.url).replace(/"/g,'&quot;')}" target="_blank" rel="noopener" style="display:block;margin-top:8px;padding:11px 12px;border-radius:12px;border:1px solid #4b3a20;background:#17130d;color:#fff;text-decoration:none;font-size:.82rem"><b>${i+1}. ${String(s.name||'Song').replace(/[<>]/g,'')}</b><br><small style="color:#a99b7b">Open song ↗</small></a>`).join(''):'<div style="padding-top:10px;color:#9f947c;font-size:.8rem">Admin က song link မထည့်ရသေးပါ။</div>';
-    b.onclick=(e)=>{e.stopPropagation();modal.style.display=modal.style.display==='none'?'block':'none';b.classList.toggle('playing',modal.style.display==='block');l.textContent=modal.style.display==='block'?'SELECT A SONG':'STYLE SAAN MUSIC';l.classList.add('show');clearTimeout(window.__styleMusicTimer);window.__styleMusicTimer=setTimeout(()=>l.classList.remove('show'),1400)};
+    b.onclick=(e)=>{
+      e.stopPropagation();
+      if(songs.length===1){
+        const url=String(songs[0].url||'').trim();
+        if(url){
+          window.open(url,'_blank','noopener,noreferrer');
+          b.classList.add('playing');
+          l.textContent='OPENING MUSIC…';
+          l.classList.add('show');
+          clearTimeout(window.__styleMusicTimer);window.__styleMusicTimer=setTimeout(()=>l.classList.remove('show'),1400);
+          return;
+        }
+      }
+      modal.style.display=modal.style.display==='none'?'block':'none';
+      b.classList.toggle('playing',modal.style.display==='block');
+      l.textContent=modal.style.display==='block'?'SELECT A SONG':'STYLE SAAN MUSIC';
+      l.classList.add('show');
+      clearTimeout(window.__styleMusicTimer);window.__styleMusicTimer=setTimeout(()=>l.classList.remove('show'),1400)
+    };
     document.addEventListener('click',e=>{if(!modal.contains(e.target)&&e.target!==b){modal.style.display='none';b.classList.remove('playing')}});
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initMusic);else initMusic();
